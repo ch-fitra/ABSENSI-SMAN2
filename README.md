@@ -43,16 +43,18 @@ PowerShell, dari folder proyek:
 ```powershell
 cd D:\Project\ABSENSI-SMAN2
 # Buat akun guru pertama. Nama, email, dan password ditanyakan secara interaktif.
-.\.runtime\php\php.exe artisan teacher:create
+php artisan teacher:create
 # Jalankan aplikasi dengan aset yang sudah dibangun.
-powershell -ExecutionPolicy Bypass -File .\scripts\start-local.ps1
+php artisan serve
 ```
+
+Cukup jalankan `php artisan serve`, termasuk di Git Bash yang masih memilih PHP 8.2 XAMPP. Entry point `artisan` akan meneruskan perintah ke PHP 8.4 portabel dalam `.runtime/php` sebelum memuat Composer. Tidak perlu mengubah PATH atau membuka ulang terminal untuk proyek ini.
 
 Buka **http://127.0.0.1:8000**. Di terminal kedua:
 
 ```powershell
 cd D:\Project\ABSENSI-SMAN2
-powershell -ExecutionPolicy Bypass -File .\scripts\start-local.ps1 -Mode schedule
+php artisan schedule:work
 ```
 
 Tidak ada kredensial guru bawaan. Setelah login, buka **Data Siswa**, tambahkan kelas dan siswa, lalu tekan **Mulai Absensi**. Siswa membuka `/siswa/masuk` menggunakan NISN yang terdaftar.

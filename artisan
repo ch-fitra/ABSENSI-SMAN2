@@ -4,6 +4,35 @@
 use Illuminate\Foundation\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 
+// An existing terminal may still resolve XAMPP's older PHP before the project runtime.
+// Select the compatible runtime before Composer performs its platform checks.
+if (PHP_VERSION_ID < 80401) {
+    $projectPhp = __DIR__.'/'.(PHP_OS_FAMILY === 'Windows' ? '.runtime/php/php.exe' : '.runtime/php/bin/php');
+
+    if (! is_file($projectPhp) || realpath($projectPhp) === realpath(PHP_BINARY)) {
+        fwrite(STDERR, "Proyek ini memerlukan PHP 8.4.1 atau lebih baru. Jalankan scripts/setup-windows.ps1 untuk menyiapkan PHP proyek.\n");
+        exit(1);
+    }
+
+    putenv('PATH='.dirname($projectPhp).PATH_SEPARATOR.getenv('PATH'));
+
+    $process = proc_open(
+        [$projectPhp, __FILE__, ...array_slice($_SERVER['argv'], 1)],
+        [0 => STDIN, 1 => STDOUT, 2 => STDERR],
+        $pipes,
+        __DIR__,
+        null,
+        ['bypass_shell' => true],
+    );
+
+    if (! is_resource($process)) {
+        fwrite(STDERR, "PHP proyek tidak dapat dijalankan. Periksa instalasi di .runtime/php.\n");
+        exit(1);
+    }
+
+    exit(proc_close($process));
+}
+
 define('LARAVEL_START', microtime(true));
 
 // Register the Composer autoloader...

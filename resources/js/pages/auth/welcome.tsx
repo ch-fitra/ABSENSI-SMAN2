@@ -2,13 +2,33 @@ import { Head, Link } from "@inertiajs/react";
 import {
     ArrowRight,
     BookOpen,
-    Check,
     Clock3,
     GraduationCap,
     ShieldCheck,
+    MousePointer2,
+    FileCheck2,
 } from "lucide-react";
 import { motion } from "motion/react";
 import { Brand } from "@/components/shared";
+import { AttendanceArt } from "@/components/attendance-art";
+
+const principles = [
+    {
+        icon: MousePointer2,
+        title: "Mudah diakses",
+        description: "Dari layar mana pun.",
+    },
+    {
+        icon: Clock3,
+        title: "Lebih sederhana",
+        description: "Lebih banyak waktu belajar.",
+    },
+    {
+        icon: FileCheck2,
+        title: "Tetap teratur",
+        description: "Setiap kehadiran tercatat.",
+    },
+];
 
 export default function Welcome() {
     return (
@@ -16,7 +36,10 @@ export default function Welcome() {
             <Head title="Selamat Datang" />
             <header className="public-header">
                 <Brand />
-                <span className="public-tag">PORTAL ABSENSI SEKOLAH</span>
+                <span className="public-tag">
+                    <span className="public-tag-dot" />
+                    PORTAL ABSENSI SEKOLAH
+                </span>
             </header>
             <main className="welcome-main">
                 <motion.div
@@ -70,49 +93,38 @@ export default function Welcome() {
                     </span>
                 </motion.div>
                 <div className="welcome-visual" aria-hidden="true">
-                    <div className="visual-orbit orbit-one" />
-                    <div className="visual-orbit orbit-two" />
-                    <div className="visual-top">
-                        <span className="visual-pill">
-                            LANGKAH KECIL, DAMPAK BESAR
-                        </span>
-                        <span>02 /</span>
+                    <div className="welcome-visual-label">
+                        <span>KEHADIRAN YANG BERARTI</span>
+                        <SparkleMark />
                     </div>
-                    <div className="visual-message">
-                        Setiap hari.
-                        <br />
-                        Setiap langkah.
-                        <br />
-                        <span>Setiap kehadiran.</span>
-                    </div>
-                    <div className="visual-attendance">
-                        <div className="flex-between">
-                            <span className="visual-icon">
-                                <Check size={22} />
-                            </span>
-                            <span className="visual-date">
-                                SEMANGAT BELAJAR
-                            </span>
-                        </div>
-                        <h3>Siap hadir hari ini?</h3>
-                        <div className="visual-line" />
-                        <div className="visual-avatars">
-                            {["A", "R", "S", "N"].map((x) => (
-                                <span key={x}>{x}</span>
-                            ))}
-                            <small>Belajar dan bertumbuh bersama</small>
-                        </div>
-                    </div>
-                    <div className="visual-bottom">
-                        <Clock3 size={17} />
-                        <span>Hadir tepat waktu. Mulai hal baik.</span>
-                    </div>
+                    <AttendanceArt />
                 </div>
             </main>
+            <div className="welcome-principles">
+                {principles.map(({ icon: Icon, title, description }) => (
+                    <div key={title}>
+                        <span>
+                            <Icon size={20} strokeWidth={1.6} />
+                        </span>
+                        <div>
+                            <strong>{title}</strong>
+                            <p>{description}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
             <footer className="public-footer">
                 <span>© {new Date().getFullYear()} SMAN 2 Rantau Selatan</span>
                 <span>Portal kehadiran siswa</span>
             </footer>
         </div>
+    );
+}
+
+function SparkleMark() {
+    return (
+        <span className="welcome-star" aria-hidden="true">
+            ✦
+        </span>
     );
 }

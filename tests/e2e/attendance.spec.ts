@@ -43,6 +43,20 @@ test("alur guru dan siswa, konfirmasi, koreksi, PDF, serta tampilan responsif", 
     });
     await teacherLogin(page);
     await noOverflow(page);
+    if (testInfo.project.name === "mobile") {
+        const menuButton = page.getByRole("button", {
+            name: "Buka navigasi",
+            exact: true,
+        });
+        await menuButton.click();
+        await expect(page.locator("#app-sidebar .brand")).toBeFocused();
+        await page.keyboard.press("Shift+Tab");
+        await expect(
+            page.getByRole("button", { name: "Keluar dari akun", exact: true }),
+        ).toBeFocused();
+        await page.keyboard.press("Escape");
+        await expect(menuButton).toBeFocused();
+    }
     await expect(page.locator(".stat-card").last()).toHaveCSS("opacity", "1");
     await page.screenshot({
         path: `.runtime/screenshots/${testInfo.project.name}-teacher-dashboard.png`,

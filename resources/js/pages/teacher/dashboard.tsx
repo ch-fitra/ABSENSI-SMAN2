@@ -1,5 +1,11 @@
 import { Link, usePage, usePoll } from "@inertiajs/react";
-import { ArrowRight, CalendarDays, Plus } from "lucide-react";
+import {
+    ArrowRight,
+    BookOpen,
+    CalendarDays,
+    Plus,
+    Sparkles,
+} from "lucide-react";
 import AppLayout from "@/layouts/app-layout";
 import {
     EmptyState,
@@ -45,6 +51,13 @@ export default function Dashboard({
                 </span>
             </PageHeader>
             <section className="dashboard-hero">
+                <div className="hero-ornament" aria-hidden="true">
+                    <div />
+                    <span>
+                        <BookOpen size={54} strokeWidth={1.2} />
+                    </span>
+                    <Sparkles size={24} strokeWidth={1.2} />
+                </div>
                 <div>
                     <span className="eyebrow">SIAP MEMULAI PELAJARAN?</span>
                     <h2>Absensi mudah. Fokus mengajar.</h2>

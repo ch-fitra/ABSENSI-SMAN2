@@ -21,7 +21,7 @@ import {
     type ReactElement,
     type ReactNode,
 } from "react";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { Button } from "./ui/button";
 import { formatDate, sessionLabels } from "@/lib/utils";
 import type {
@@ -163,6 +163,7 @@ export function StatusBadge({
     );
 }
 export function Stats({ summary }: { summary: Summary }) {
+    const reduceMotion = useReducedMotion();
     return (
         <div className="stats-grid">
             {(
@@ -175,7 +176,7 @@ export function Stats({ summary }: { summary: Summary }) {
                 ] as const
             ).map(([key, label, Icon], i) => (
                 <motion.div
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={reduceMotion ? false : { opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.25, delay: i * 0.035 }}
                     className={`stat-card stat-${key}`}
@@ -191,6 +192,13 @@ export function Stats({ summary }: { summary: Summary }) {
                             ? "Hasil terkonfirmasi"
                             : "Catatan kehadiran"}
                     </small>
+                    <span className="stat-meter" aria-hidden="true">
+                        <span
+                            style={{
+                                width: `${summary.total ? (key === "total" ? 100 : Math.max(0, Math.min(100, (summary[key] / summary.total) * 100))) : 0}%`,
+                            }}
+                        />
+                    </span>
                 </motion.div>
             ))}
         </div>
@@ -230,7 +238,7 @@ export function SessionCard({
     return (
         <Link
             href={`/${student ? "siswa" : "guru"}/absensi/${session.id}`}
-            className="session-card"
+            className={`session-card session-card-${session.status}`}
         >
             <div className="flex-between">
                 <span className="class-chip">
@@ -400,13 +408,35 @@ export function AttendanceTimer({
     );
 }
 export function SuccessAnimation() {
+    const reduceMotion = useReducedMotion();
     return (
         <motion.div
             className="success-check"
-            initial={{ scale: 0.7, opacity: 0 }}
+            initial={reduceMotion ? false : { scale: 0.7, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 240, damping: 20 }}
         >
-            <Check size={42} strokeWidth={2.5} />
+            <motion.svg
+                width="42"
+                height="42"
+                viewBox="0 0 48 48"
+                fill="none"
+                aria-hidden="true"
+            >
+                <motion.path
+                    d="M11 24.5 20 33 37 15"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    initial={reduceMotion ? false : { pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{
+                        duration: reduceMotion ? 0 : 0.4,
+                        delay: reduceMotion ? 0 : 0.1,
+                    }}
+                />
+            </motion.svg>
         </motion.div>
     );
 }

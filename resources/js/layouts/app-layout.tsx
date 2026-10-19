@@ -13,7 +13,8 @@ import {
     Users,
     X,
 } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import { Brand } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import type { SharedProps } from "@/types";
@@ -32,6 +33,40 @@ export default function AppLayout({
         document.documentElement.classList.contains("dark"),
     );
     const [navigating, setNavigating] = useState(false);
+    const reduceMotion = useReducedMotion();
+    const sidebarRef = useRef<HTMLElement>(null);
+    useEffect(() => {
+        if (!open) return;
+        const trigger = document.activeElement as HTMLElement | null;
+        const focusFrame = window.requestAnimationFrame(() => {
+            sidebarRef.current?.querySelector<HTMLElement>("a")?.focus();
+        });
+        const closeOnEscape = (event: KeyboardEvent) => {
+            if (event.key === "Escape") setOpen(false);
+            if (event.key === "Tab") {
+                const controls =
+                    sidebarRef.current?.querySelectorAll<HTMLElement>(
+                        "a, button:not(:disabled)",
+                    );
+                if (!controls?.length) return;
+                const first = controls[0];
+                const last = controls[controls.length - 1];
+                if (event.shiftKey && document.activeElement === first) {
+                    event.preventDefault();
+                    last.focus();
+                } else if (!event.shiftKey && document.activeElement === last) {
+                    event.preventDefault();
+                    first.focus();
+                }
+            }
+        };
+        document.addEventListener("keydown", closeOnEscape);
+        return () => {
+            window.cancelAnimationFrame(focusFrame);
+            document.removeEventListener("keydown", closeOnEscape);
+            trigger?.focus();
+        };
+    }, [open]);
     useEffect(() => {
         const start = router.on("start", (event) => {
             if (!event.detail.visit.only.length) setNavigating(true);
@@ -80,9 +115,15 @@ export default function AppLayout({
             localStorage.setItem("theme", next ? "dark" : "light");
         } catch {}
     }
+    const isActive = (href: string) =>
+        url === href ||
+        (href.endsWith("/absensi/buat") && url.includes("/absensi/"));
     return (
         <div className="app-shell">
             <Head title={title} />
+            <a className="skip-link" href="#main-content">
+                Langsung ke konten
+            </a>
             {open && (
                 <button
                     className="sidebar-scrim"
@@ -90,7 +131,11 @@ export default function AppLayout({
                     aria-label="Tutup navigasi"
                 />
             )}
-            <aside className={`sidebar ${open ? "sidebar-open" : ""}`}>
+            <aside
+                ref={sidebarRef}
+                id="app-sidebar"
+                className={`sidebar ${open ? "sidebar-open" : ""}`}
+            >
                 <div className="sidebar-brand">
                     <Brand />
                     <Button
@@ -112,10 +157,13 @@ export default function AppLayout({
                             key={href}
                             href={href}
                             onClick={() => setOpen(false)}
-                            className={`nav-item ${url === href || (href.endsWith("/absensi/buat") && url.includes("/absensi/")) ? "nav-active" : ""}`}
+                            aria-current={isActive(href) ? "page" : undefined}
+                            className={`nav-item ${isActive(href) ? "nav-active" : ""}`}
                         >
-                            <Icon size={19} />
-                            {label}
+                            <span className="nav-icon">
+                                <Icon size={19} />
+                            </span>
+                            <span>{label}</span>
                             <ChevronRight size={15} className="nav-arrow" />
                         </Link>
                     ))}
@@ -159,11 +207,18 @@ export default function AppLayout({
                             className="mobile-only"
                             onClick={() => setOpen(true)}
                             aria-label="Buka navigasi"
+                            aria-expanded={open}
+                            aria-controls="app-sidebar"
                         >
                             <Menu size={22} />
                         </Button>
                         <span className="topbar-title">
-                            Portal Absensi <span>/ {title}</span>
+                            <GraduationCap size={19} strokeWidth={1.6} />
+                            <span className="topbar-breadcrumb">
+                                Portal Absensi
+                            </span>
+                            <ChevronRight size={13} />
+                            <strong>{title}</strong>
                         </span>
                     </div>
                     <div className="topbar-right">
@@ -189,13 +244,18 @@ export default function AppLayout({
                 </header>
                 <main className="main-content" id="main-content">
                     {flash.success && (
-                        <div
+                        <motion.div
                             key={flash.success}
+                            initial={
+                                reduceMotion ? false : { opacity: 0, y: -7 }
+                            }
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.2 }}
                             className="alert alert-success"
                             role="status"
                         >
                             {flash.success}
-                        </div>
+                        </motion.div>
                     )}
                     {navigating && (
                         <div
@@ -203,7 +263,18 @@ export default function AppLayout({
                             aria-label="Memuat halaman"
                         />
                     )}
-                    {children}
+                    <motion.div
+                        className="page-content"
+                        key={url}
+                        initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{
+                            duration: 0.32,
+                            ease: [0.22, 1, 0.36, 1],
+                        }}
+                    >
+                        {children}
+                    </motion.div>
                 </main>
                 <footer className="app-footer">
                     <span>
@@ -212,6 +283,26 @@ export default function AppLayout({
                     <span>Hadir. Belajar. Bertumbuh.</span>
                 </footer>
             </div>
+            <nav className="mobile-dock" aria-label="Navigasi cepat">
+                {items.slice(0, 4).map(({ label, href, icon: Icon }) => (
+                    <Link
+                        key={href}
+                        href={href}
+                        aria-current={isActive(href) ? "page" : undefined}
+                        className={isActive(href) ? "dock-active" : ""}
+                    >
+                        <span>
+                            <Icon size={20} />
+                        </span>
+                        <small>
+                            {label === "Riwayat & Rekap" ||
+                            label === "Riwayat Kehadiran"
+                                ? "Riwayat"
+                                : label}
+                        </small>
+                    </Link>
+                ))}
+            </nav>
         </div>
     );
 }

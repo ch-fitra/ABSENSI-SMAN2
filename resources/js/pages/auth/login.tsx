@@ -11,6 +11,7 @@ import { motion } from "motion/react";
 import { useState, type FormEvent } from "react";
 import { Brand, Field, Loading } from "@/components/shared";
 import { Button } from "@/components/ui/button";
+import { AttendanceArt } from "@/components/attendance-art";
 
 export default function Login({ role }: { role: "teacher" | "student" }) {
     const teacher = role === "teacher";
@@ -32,7 +33,7 @@ export default function Login({ role }: { role: "teacher" | "student" }) {
             <Head title={teacher ? "Masuk Guru" : "Masuk Siswa"} />
             <div className="login-story">
                 <Brand />
-                <div>
+                <div className="login-story-copy">
                     <span className="eyebrow">SMAN 2 RANTAU SELATAN</span>
                     <h1>
                         {teacher ? (
@@ -59,6 +60,7 @@ export default function Login({ role }: { role: "teacher" | "student" }) {
                             : "Satu langkah kecil untuk memulai hari belajar yang berarti."}
                     </p>
                 </div>
+                <AttendanceArt compact />
                 <span className="login-story-footer">
                     Hadir. Belajar. Bertumbuh.
                 </span>

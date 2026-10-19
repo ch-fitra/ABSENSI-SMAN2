@@ -1,0 +1,341 @@
+# PRODUCT REQUIREMENTS DOCUMENT (PRD)
+## Website Absensi SMAN 2 Rantau Selatan
+
+**Versi:** 1.0  
+**Jenis aplikasi:** Website Absensi Siswa  
+**Platform:** Browser HP, tablet, laptop, dan PC  
+**Pengguna:** Guru dan Siswa  
+**Status:** Rancangan awal siap menjadi pedoman pengembangan
+
+---
+
+## 1. Product Overview
+
+Website Absensi SMAN 2 Rantau Selatan merupakan aplikasi berbasis web yang digunakan untuk mencatat kehadiran siswa secara digital pada setiap sesi mata pelajaran.
+
+Sistem menggunakan dua jenis pengguna, yaitu guru dan siswa. Guru dapat membuka sesi absensi untuk kelas mana pun secara fleksibel, sedangkan siswa dapat mengisi kehadiran melalui akun berbasis NISN.
+
+Setiap sesi absensi memiliki batas waktu otomatis, konfirmasi oleh guru, masa koreksi, riwayat kehadiran, serta kemampuan mengunduh laporan PDF.
+
+Website harus mudah dipahami oleh pengguna yang kurang terbiasa menggunakan teknologi, tanpa mengurangi kenyamanan pengguna yang sudah terbiasa.
+
+## 2. Tujuan Produk
+
+- Mempermudah pencatatan absensi siswa per mata pelajaran.
+- Memungkinkan guru membuka sesi dalam beberapa langkah sederhana.
+- Membuat siswa dapat mengisi absensi dengan cepat melalui HP.
+- Mengurangi kesalahan pencatatan dan duplikasi data.
+- Memisahkan data absensi masing-masing guru.
+- Menyediakan rekap dan laporan kehadiran dalam format PDF.
+
+## 3. Peran dan Hak Akses
+
+### 3.1 Guru
+
+Guru memiliki akses untuk:
+
+- Login menggunakan email dan password.
+- Mengubah informasi akun dan password sendiri.
+- Membuat sesi absensi dengan memilih kelas, mengisi mata pelajaran, dan menentukan durasi.
+- Memantau siswa yang sudah dan belum mengisi.
+- Menutup sesi secara manual.
+- Mengoreksi dan mengonfirmasi absensi miliknya.
+- Melihat riwayat sesi yang dibuatnya.
+- Mengunduh laporan PDF dari sesi miliknya.
+- Menggunakan serta menambahkan data siswa pada daftar bersama, termasuk melalui Excel.
+
+Guru tidak boleh mengakses, mengoreksi, mengonfirmasi, atau mengunduh sesi absensi milik guru lain.
+
+### 3.2 Siswa
+
+Siswa memiliki akses untuk:
+
+- Login menggunakan NISN tanpa password.
+- Melihat sesi absensi aktif yang ditujukan kepada kelasnya.
+- Mengirim satu respons kehadiran pada setiap sesi.
+- Melihat status sesi yang menunggu konfirmasi.
+- Melihat riwayat kehadiran yang sudah dikonfirmasi.
+- Mengunduh laporan PDF kehadiran pribadi.
+- Logout.
+
+Siswa tidak boleh mengakses data absensi milik siswa lain melalui akunnya. Namun, model login NISN saja tidak dapat menjamin bahwa pengguna yang masuk merupakan pemilik NISN tersebut.
+
+## 4. Halaman Website
+
+### 4.1 Halaman Umum
+
+**Halaman Pemilihan Login**
+
+Menampilkan identitas SMAN 2 Rantau Selatan serta dua pilihan yang jelas:
+
+- Masuk sebagai Guru
+- Masuk sebagai Siswa
+
+**Login Guru**
+
+Form email dan password, tombol masuk, validasi kesalahan, indikator loading, dan opsi pemulihan password jika layanan email sudah dikonfigurasi.
+
+**Login Siswa**
+
+Satu kolom input NISN, tombol masuk, pesan kesalahan bila NISN tidak terdaftar, dan indikator loading.
+
+### 4.2 Halaman Guru
+
+**Dashboard Guru**
+
+Menampilkan nama guru, tombol utama Mulai Absensi, jumlah sesi miliknya, ringkasan kehadiran, sesi aktif, dan riwayat terbaru.
+
+**Buat Sesi Absensi**
+
+Form sederhana berisi:
+
+- Kelas
+- Mata pelajaran (input bebas)
+- Durasi sesi (default 5 menit, dapat diubah)
+
+Setelah seluruh data valid, guru menekan Mulai Absensi.
+
+**Detail Sesi**
+
+Menampilkan timer, daftar siswa, status kehadiran, jumlah siswa yang sudah mengisi, dan tombol Tutup Sesi.
+
+**Konfirmasi Absensi**
+
+Setelah sesi berakhir, guru melihat seluruh daftar siswa beserta status Hadir, Izin, Sakit, atau Alpa. Guru dapat mengoreksi sebelum menekan Konfirmasi Absensi.
+
+**Riwayat dan Rekap**
+
+Filter berdasarkan tanggal/rentang tanggal, kelas, dan mata pelajaran. Semua data dibatasi pada sesi milik guru tersebut. Menyediakan tombol unduh PDF.
+
+**Data Siswa Bersama**
+
+Guru dapat melihat daftar siswa, memilih kelas, mengunduh template Excel, mengimpor data, dan menambahkan siswa. Perubahan data bersama harus divalidasi untuk mencegah duplikasi.
+
+**Pengaturan Akun**
+
+Guru dapat mengubah nama, email, serta password miliknya sendiri.
+
+### 4.3 Halaman Siswa
+
+**Dashboard Siswa**
+
+Menampilkan nama, kelas, sesi absensi aktif, ringkasan kehadiran yang sudah dikonfirmasi, dan riwayat terbaru.
+
+**Form Absensi**
+
+Menampilkan mata pelajaran, nama guru, kelas, timer, serta pilihan Hadir, Izin, dan Sakit.
+
+Kolom keterangan tersedia sebagai input opsional.
+
+**Riwayat Kehadiran**
+
+Menampilkan hasil absensi yang sudah dikonfirmasi guru. Tersedia filter tanggal dan tombol unduh PDF pribadi.
+
+## 5. Alur Absensi
+
+### 5.1 Pembuatan Sesi
+
+1. Guru login.
+2. Guru memilih Mulai Absensi.
+3. Guru menentukan kelas, mata pelajaran, dan durasi.
+4. Sistem mencatat waktu mulai dan batas waktu sesi.
+5. Sistem membuat daftar peserta berdasarkan data siswa di kelas saat sesi dibuka.
+6. Sesi menjadi aktif dan muncul pada dashboard siswa yang termasuk dalam daftar peserta tersebut.
+
+Guru dapat membuka sesi baru untuk kelas dan mata pelajaran yang sama berkali-kali pada hari yang sama.
+
+Setiap sesi memiliki identitas unik dan tidak terikat pada jadwal mata pelajaran.
+
+### 5.2 Pengisian Siswa
+
+Siswa login dan memilih sesi aktif. Siswa memilih satu status kehadiran lalu mengirim absensi.
+
+Jika penyimpanan berhasil, tampil animasi centang beserta informasi bahwa absensi berhasil dikirim.
+
+Siswa tidak dapat mengirim kehadiran kedua kalinya untuk sesi yang sama.
+
+### 5.3 Penutupan Sesi
+
+Sesi otomatis berakhir saat batas waktu server tercapai atau lebih awal jika guru menekan Tutup Sesi.
+
+Siswa yang belum mengisi otomatis diberi status Alpa sementara. Siswa tidak dapat mengisi kembali setelah sesi ditutup.
+
+Guru kemudian dapat memeriksa dan mengoreksi status siswa sebelum mengonfirmasi.
+
+### 5.4 Konfirmasi dan Koreksi
+
+Setelah guru menekan Konfirmasi Absensi, hasil resmi dapat dilihat siswa.
+
+Guru tetap dapat mengoreksi sesi miliknya sampai tujuh hari setelah sesi ditutup.
+
+Setiap perubahan setelah penyimpanan awal mencatat status sebelumnya, status baru, waktu perubahan, dan guru yang mengubahnya.
+
+Setelah batas tujuh hari berlalu, seluruh status terkunci. Apabila guru belum mengonfirmasi, konfirmasi tetap dapat dilakukan terhadap data yang sudah terkunci tanpa mengubah nilainya.
+
+## 6. Data Siswa Bersama
+
+Seluruh siswa sekolah berada dalam satu sumber data bersama.
+
+Template Excel minimal:
+
+| NISN | Nama Lengkap |
+|---|---|
+| 1234567890 | Contoh Siswa A |
+| 1234567891 | Contoh Siswa B |
+
+Guru memilih kelas tujuan sebelum melakukan impor.
+
+Proses impor harus:
+
+- Memeriksa format NISN.
+- Menolak duplikasi NISN.
+- Menampilkan pratinjau data sebelum disimpan.
+- Menunjukkan data berhasil, dilewati, dan gagal.
+- Mempertahankan data absensi sebelumnya saat informasi siswa diperbaiki.
+
+Semua guru dapat menggunakan daftar kelas dan siswa, tetapi tidak dapat mengubah data kehadiran milik guru lain.
+
+## 7. Rekap dan Laporan PDF
+
+### Laporan Guru
+
+Guru dapat membuat laporan per sesi atau periode tertentu berdasarkan sesi miliknya sendiri.
+
+Filter: kelas, mata pelajaran, tanggal awal, dan tanggal akhir.
+
+Isi laporan meliputi identitas sekolah, guru, kelas, mata pelajaran, periode, daftar siswa, status kehadiran, dan ringkasan jumlah kehadiran.
+
+### Laporan Siswa
+
+Siswa dapat mengunduh riwayat kehadiran pribadi berdasarkan periode yang dipilih.
+
+Hanya hasil yang sudah dikonfirmasi yang ditampilkan sebagai data resmi pada PDF.
+
+Format awal A4 dengan tata letak sederhana, bersih, dan siap dicetak. Kop surat lengkap dan tempat tanda tangan dapat ditambahkan pada pengembangan format laporan berikutnya.
+
+## 8. Desain UI/UX
+
+Website menggunakan konsep modern, minimalis, dan mobile-first.
+
+**Karakter visual:**
+
+- Warna utama navy blue dengan aksen hijau dan oranye.
+- Background netral dan kartu putih.
+- Font sans-serif yang jelas, misalnya Inter.
+- Ikon sederhana disertai label teks.
+- Tombol utama besar dan mudah ditemukan.
+- Light mode sebagai default dan Dark mode sebagai alternatif.
+
+**Responsivitas:**
+
+- HP: tampilan satu kolom dengan navigasi ringkas.
+- Tablet: dua kolom bila ruang memungkinkan.
+- Laptop/PC: sidebar serta tabel rekap lengkap.
+
+Tabel guru pada HP harus memiliki tampilan adaptif agar tidak memerlukan penggeseran horizontal berlebihan.
+
+**Animasi:**
+
+- Fade-in halaman login.
+- Transisi ringan pada kartu dashboard.
+- Loading pada proses masuk dan kirim.
+- Animasi checkmark setelah absensi berhasil disimpan.
+- Dialog konfirmasi untuk tindakan penting.
+- Skeleton loading ketika mengambil data.
+
+Animasi harus singkat, tidak menghambat interaksi, dan menghormati pengaturan reduced motion perangkat.
+
+## 9. Technology Stack
+
+| Komponen | Teknologi |
+|---|---|
+| Backend | Laravel 13 |
+| Frontend | React 19 + TypeScript |
+| Integrasi | Inertia.js |
+| UI | Tailwind CSS 4 + shadcn/ui |
+| Database | MySQL |
+| ORM | Eloquent |
+| Migration | Laravel Migrations |
+| Animasi | Motion for React / CSS |
+| Grafik | Recharts, bila diperlukan |
+| PDF | Laravel DomPDF |
+| Penutupan otomatis | Laravel Scheduler |
+| Server | Server pribadi dengan domain dan HTTPS |
+
+## 10. Struktur Database
+
+### `teachers`
+
+Menyimpan akun guru, termasuk ID, nama, email unik, password hash, dan timestamps.
+
+### `classes`
+
+Menyimpan ID kelas, nama kelas, tingkat kelas, serta status aktif.
+
+### `students`
+
+Menyimpan ID, NISN unik, nama lengkap, class ID, dan timestamps. NIS dapat ditambahkan sebagai informasi opsional jika diperlukan.
+
+### `attendance_sessions`
+
+Menyimpan ID sesi, teacher ID, class ID, nama mata pelajaran, waktu mulai, batas waktu, waktu penutupan aktual, waktu konfirmasi, dan status sesi.
+
+### `attendance_records`
+
+Menyimpan ID, session ID, student ID, snapshot nama siswa, status kehadiran, keterangan, waktu pengisian, sumber status, dan timestamps.
+
+Pada pembukaan sesi dibuat satu catatan awal untuk setiap siswa yang terdaftar pada kelas tersebut. Catatan awal belum memiliki status kehadiran.
+
+Saat sesi ditutup, catatan yang belum diisi diubah menjadi Alpa. Kombinasi session ID dan student ID harus unik.
+
+### `attendance_change_logs`
+
+Menyimpan ID catatan, guru pengubah, status lama, status baru, waktu perubahan, serta alasan koreksi apabila diisi.
+
+Semua tabel memiliki migration dan relasi foreign key yang sesuai.
+
+## 11. Keamanan dan Aturan Sistem
+
+- Seluruh koneksi website menggunakan HTTPS.
+- Password guru disimpan menggunakan password hashing.
+- Login guru dan siswa dipisahkan secara logis.
+- Setiap request guru harus diperiksa kepemilikan sesinya melalui backend.
+- Validasi waktu sesi dilakukan oleh server, bukan hanya timer browser.
+- Proses perubahan status menggunakan transaksi database.
+- Permintaan absensi ganda harus ditolak.
+- Data PDF hanya diambil dari catatan yang boleh diakses pengguna.
+- Login siswa menggunakan NISN saja sesuai keputusan produk, dengan risiko penyamaran identitas yang harus diterima secara sadar.
+- Aktivitas login diberi rate limiting dan sesi browser dikelola dengan aman.
+- Backup MySQL dilakukan secara berkala.
+
+Pembuatan akun guru baru dilakukan melalui proses provisioning pemilik server agar tidak perlu membuat role admin atau fitur pendaftaran guru publik.
+
+## 12. Acceptance Criteria
+
+| Skenario | Hasil yang diharapkan |
+|---|---|
+| Guru membuka sesi | Sesi aktif tampil untuk siswa yang terdaftar di kelas |
+| Siswa mengirim absensi | Data tersimpan satu kali |
+| Siswa mengirim dua kali | Sistem menolak pengisian kedua |
+| Timer habis | Sistem menolak pengiriman setelah batas waktu |
+| Siswa tidak mengisi | Status menjadi Alpa saat penutupan |
+| Guru menutup manual | Sesi langsung tidak menerima pengisian |
+| Guru konfirmasi | Hasil resmi tersedia untuk siswa |
+| Guru koreksi sebelum 7 hari | Koreksi disimpan dan tercatat |
+| Guru koreksi setelah 7 hari | Permintaan ditolak |
+| Guru A mengakses sesi Guru B | Akses ditolak oleh backend |
+| Guru membuat sesi untuk kelas yang sama | Sesi baru tersimpan tanpa menimpa sesi lama |
+| Impor NISN duplikat | Sistem menampilkan konflik tanpa menggandakan siswa |
+| Guru unduh PDF | Hanya data sesi miliknya masuk laporan |
+| Siswa unduh PDF | Hanya kehadiran pribadinya masuk laporan |
+| Akses dari HP | Semua fungsi utama dapat digunakan tanpa kerusakan layout |
+
+## 13. Di Luar Ruang Lingkup
+
+Aplikasi tidak mengembangkan jadwal pelajaran, nilai, rapor, PPDB, pembayaran, portal orang tua, akun admin, QR code, GPS, absensi wajah, notifikasi WhatsApp, atau integrasi SIAKAD.
+
+Fokus pengembangan tetap terbatas pada login, data siswa dan kelas, sesi absensi, konfirmasi, koreksi, riwayat, dan laporan PDF.
+
+---
+
+**Prinsip akhir:** Setiap fitur harus mempermudah kegiatan absensi. Apabila fitur tidak membantu guru membuka sesi, siswa mengisi kehadiran, atau pengguna melihat hasilnya, fitur tersebut tidak perlu dimasukkan dalam versi pertama.

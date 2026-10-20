@@ -6,7 +6,6 @@ import {
     MessageSquare,
     QrCode,
 } from "lucide-react";
-import { QRCodeSVG } from "qrcode.react";
 import { useRef, useState } from "react";
 import AppLayout from "@/layouts/app-layout";
 import { PageHeader } from "@/components/shared";
@@ -16,6 +15,8 @@ import {
     PublicFormStatus,
 } from "@/components/public-attendance";
 import { Button } from "@/components/ui/button";
+import { PublicAttendanceQr } from "@/components/public-attendance-qr";
+import { downloadPublicQr } from "@/lib/public-attendance-qr";
 import {
     usePublicFormPolling,
     wibDate,
@@ -34,27 +35,17 @@ export default function ShowPublicForm({
     ]);
     const qr = useRef<SVGSVGElement>(null);
     const [downloadError, setDownloadError] = useState("");
-    function download() {
+    const [downloading, setDownloading] = useState(false);
+    async function download(format: "png" | "svg") {
+        if (!qr.current || downloading) return;
+        setDownloadError("");
+        setDownloading(true);
         try {
-            if (!qr.current) return;
-            const svg = qr.current.cloneNode(true) as SVGSVGElement;
-            svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-            svg.setAttribute("width", "1024");
-            svg.setAttribute("height", "1024");
-            const url = URL.createObjectURL(
-                new Blob([new XMLSerializer().serializeToString(svg)], {
-                    type: "image/svg+xml;charset=utf-8",
-                }),
-            );
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = `qr-absensi-${form.id}.svg`;
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+            await downloadPublicQr(qr.current, form.id, format);
         } catch {
             setDownloadError("QR belum dapat diunduh. Silakan coba kembali.");
+        } finally {
+            setDownloading(false);
         }
     }
     const localOnly = ["127.0.0.1", "localhost", "[::1]"].includes(
@@ -152,22 +143,18 @@ export default function ShowPublicForm({
                         PINDAI UNTUK MENGISI
                     </span>
                     <div className="public-qr">
-                        <QRCodeSVG
-                            ref={qr}
-                            value={form.public_url}
-                            size={256}
-                            level="M"
-                            marginSize={4}
-                            title={`QR formulir ${form.title}`}
-                        />
+                        <PublicAttendanceQr ref={qr} form={form} />
                     </div>
                     <h3>Buka kamera, pindai QR.</h3>
                     <p className="muted">
                         Langsung ke formulir. Siswa tidak perlu login.
                     </p>
-                    <Button type="button" onClick={download} variant="outline">
+                    <Button type="button" onClick={() => download("png")} disabled={downloading}>
                         <Download size={17} />
                         Unduh QR Code
+                    </Button>
+                    <Button type="button" onClick={() => download("svg")} disabled={downloading} variant="outline">
+                        Unduh SVG untuk Cetak
                     </Button>
                     {downloadError && (
                         <p className="field-error" role="alert">
@@ -175,7 +162,7 @@ export default function ShowPublicForm({
                         </p>
                     )}
                     <small className="muted">
-                        Format SVG · tetap tajam saat dicetak
+                        PNG untuk dibagikan · SVG untuk dicetak
                     </small>
                 </aside>
             </div>

@@ -91,7 +91,7 @@ test("link dan QR: guru membuat, tamu mengisi, polling rekap, dan PDF", async ({
     );
     const qrEvent = page.waitForEvent("download");
     await page
-        .getByRole("button", { name: "Unduh QR Code", exact: true })
+        .getByRole("button", { name: "Unduh SVG untuk Cetak", exact: true })
         .click();
     const qr = await qrEvent;
     const qrPath = `.runtime/screenshots/${testInfo.project.name}-public-qr.svg`;
@@ -109,11 +109,11 @@ test("link dan QR: guru membuat, tamu mengisi, polling rekap, dan PDF", async ({
                 image.src = blob;
             });
             const canvas = document.createElement("canvas");
-            canvas.width = 512;
-            canvas.height = 512;
+            canvas.width = 720;
+            canvas.height = 1000;
             const context = canvas.getContext("2d")!;
-            context.drawImage(image, 0, 0, 512, 512);
-            const data = context.getImageData(0, 0, 512, 512).data;
+            context.drawImage(image, 0, 0, 720, 1000);
+            const data = context.getImageData(0, 0, 720, 1000).data;
             let binary = "";
             for (let offset = 0; offset < data.length; offset += 8192) {
                 binary += String.fromCharCode(
@@ -126,7 +126,7 @@ test("link dan QR: guru membuat, tamu mengisi, polling rekap, dan PDF", async ({
         }
     }, qrText);
     expect(
-        jsQR(new Uint8ClampedArray(Buffer.from(pixels, "base64")), 512, 512)
+        jsQR(new Uint8ClampedArray(Buffer.from(pixels, "base64")), 720, 1000)
             ?.data,
     ).toBe(publicUrl);
     await page.screenshot({

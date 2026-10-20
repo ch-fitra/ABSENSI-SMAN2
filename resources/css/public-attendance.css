@@ -239,16 +239,16 @@
 }
 .public-qr {
     background: white;
-    padding: 4px;
+    overflow: hidden;
     border: 1px solid #e4ebee;
     border-radius: 16px;
     max-width: 100%;
 }
-.public-qr svg {
+.public-qr > svg {
     display: block;
     width: 100%;
     height: auto;
-    max-width: 256px;
+    max-width: 360px;
 }
 .public-qr-card > p {
     font-size: 12px;

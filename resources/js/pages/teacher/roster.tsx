@@ -20,6 +20,7 @@ import {
     PaginationControls,
 } from "@/components/shared";
 import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
 import { Dialog } from "@/components/ui/dialog";
 import type {
     Filters,
@@ -100,7 +101,7 @@ function StudentDialog({
                     />
                 </Field>
                 <Field label="Kelas">
-                    <select
+                    <Select
                         required
                         value={form.data.class_id}
                         onChange={(e) =>
@@ -113,7 +114,7 @@ function StudentDialog({
                                 {c.name}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                 </Field>
                 {student && (
                     <label className="checkbox-label">
@@ -155,7 +156,7 @@ function ClassDialog({ onClose }: { onClose: () => void }) {
             <form className="form-stack" onSubmit={submit}>
                 <Errors errors={form.errors} />
                 <Field label="Tingkat">
-                    <select
+                    <Select
                         value={form.data.grade_level}
                         onChange={(e) =>
                             form.setData("grade_level", e.target.value)
@@ -164,7 +165,7 @@ function ClassDialog({ onClose }: { onClose: () => void }) {
                         {["X", "XI", "XII"].map((level) => (
                             <option key={level}>{level}</option>
                         ))}
-                    </select>
+                    </Select>
                 </Field>
                 <Field label="Nama kelas">
                     <input
@@ -291,7 +292,7 @@ export default function Roster({
                     </p>
                     <form className="import-actions" onSubmit={preview}>
                         <Field label="Kelas tujuan">
-                            <select
+                            <Select
                                 required
                                 value={upload.data.class_id}
                                 onChange={(e) =>
@@ -304,7 +305,7 @@ export default function Roster({
                                         {c.name}
                                     </option>
                                 ))}
-                            </select>
+                            </Select>
                         </Field>
                         <Field label="File Excel">
                             <div className="file-picker">
@@ -440,7 +441,7 @@ export default function Roster({
                         />
                     </Field>
                     <Field label="Kelas">
-                        <select
+                        <Select
                             value={search.data.class_id}
                             onChange={(e) =>
                                 search.setData("class_id", e.target.value)
@@ -452,7 +453,7 @@ export default function Roster({
                                     {c.name}
                                 </option>
                             ))}
-                        </select>
+                        </Select>
                     </Field>
                     <div className="filter-actions">
                         <Button size="sm">

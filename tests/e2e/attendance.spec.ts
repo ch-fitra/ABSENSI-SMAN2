@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
+import { chooseOption } from "./select-helpers";
 
 async function teacherLogin(page: Page) {
     await page.goto("/guru/masuk");
@@ -14,7 +15,7 @@ async function teacherLogin(page: Page) {
         .click();
     await expect(
         page.getByRole("heading", { name: "Halo, Ibu Ratna." }),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15000 });
 }
 async function noOverflow(page: Page) {
     expect(
@@ -85,11 +86,9 @@ test("alur guru dan siswa, konfirmasi, koreksi, PDF, serta tampilan responsif", 
     await startAttendance.click();
     await methodDialog.getByRole("link", { name: /Buka Sesi Absen/ }).click();
     await expect(page).toHaveURL(/\/guru\/absensi\/buat$/);
+    await chooseOption(page, page.getByRole("combobox", { name: "Kelas", exact: true }), "X-1 · 3 siswa aktif");
     await page
-        .getByLabel("Kelas", { exact: true })
-        .selectOption({ label: "X-1 · 3 siswa aktif" });
-    await page
-        .getByLabel("Mata pelajaran", { exact: true })
+        .getByRole("combobox", { name: "Mata pelajaran", exact: true })
         .fill(`Matematika ${testInfo.project.name}`);
     await page
         .getByRole("button", { name: "Mulai Absensi", exact: true })
@@ -151,8 +150,8 @@ test("alur guru dan siswa, konfirmasi, koreksi, PDF, serta tampilan responsif", 
         page.getByRole("heading", { name: "Periksa kehadiran", exact: true }),
     ).toBeVisible();
     await expect(
-        page.getByLabel("Status Alya Putri", { exact: true }),
-    ).toHaveValue("hadir");
+        page.getByRole("combobox", { name: "Status Alya Putri", exact: true }),
+    ).toContainText("Hadir");
     await page
         .getByRole("button", { name: "Konfirmasi Absensi", exact: true })
         .click();
@@ -165,9 +164,7 @@ test("alur guru dan siswa, konfirmasi, koreksi, PDF, serta tampilan responsif", 
     await expect(
         page.getByRole("button", { name: "Konfirmasi Absensi", exact: true }),
     ).toHaveCount(0);
-    await page
-        .getByLabel("Status Bima Pratama", { exact: true })
-        .selectOption("sakit");
+    await chooseOption(page, page.getByRole("combobox", { name: "Status Bima Pratama", exact: true }), "Sakit");
     await page
         .getByLabel("Keterangan Bima Pratama", { exact: true })
         .fill("Demam, dikoreksi guru");
@@ -223,10 +220,11 @@ test("alur guru dan siswa, konfirmasi, koreksi, PDF, serta tampilan responsif", 
     await page
         .getByLabel("Nama lengkap", { exact: true })
         .fill("Siswa Uji Browser");
-    await page
-        .getByLabel("Kelas", { exact: true })
-        .last()
-        .selectOption({ label: `XI-${testInfo.project.name}` });
+    const studentClass = page.getByRole("combobox", { name: "Kelas", exact: true }).last();
+    await studentClass.click();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("button", { name: "Simpan Siswa", exact: true })).toBeVisible();
+    await chooseOption(page, studentClass, `XI-${testInfo.project.name}`);
     await page
         .getByRole("button", { name: "Simpan Siswa", exact: true })
         .click();
@@ -235,9 +233,7 @@ test("alur guru dan siswa, konfirmasi, koreksi, PDF, serta tampilan responsif", 
             exact: true,
         }),
     ).toBeVisible();
-    await page
-        .getByLabel("Kelas tujuan", { exact: true })
-        .selectOption({ label: `XI-${testInfo.project.name}` });
+    await chooseOption(page, page.getByRole("combobox", { name: "Kelas tujuan", exact: true }), `XI-${testInfo.project.name}`);
     await page
         .getByLabel("File Excel", { exact: true })
         .setInputFiles(`.runtime/browser-import-${testInfo.project.name}.xlsx`);

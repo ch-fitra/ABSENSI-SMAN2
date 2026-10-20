@@ -23,6 +23,7 @@ import {
 } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { Button } from "./ui/button";
+import { Select } from "./ui/select";
 import { formatDate, sessionLabels } from "@/lib/utils";
 import type {
     AttendanceSession,
@@ -68,8 +69,9 @@ export function Field({
             if (!isValidElement(child)) return child;
             const element = child as ReactElement<Record<string, unknown>>;
             if (
-                typeof element.type === "string" &&
-                ["input", "select", "textarea"].includes(element.type)
+                element.type === Select ||
+                (typeof element.type === "string" &&
+                    ["input", "select", "textarea"].includes(element.type))
             ) {
                 return cloneElement(element, {
                     id,

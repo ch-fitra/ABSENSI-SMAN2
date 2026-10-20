@@ -18,6 +18,7 @@ import {
     StatusBadge,
 } from "@/components/shared";
 import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
 import { Dialog } from "@/components/ui/dialog";
 import { formatDate } from "@/lib/utils";
 import type { AttendanceSession, AttendanceStatus } from "@/types";
@@ -224,7 +225,7 @@ export default function Session({ session }: { session: AttendanceSession }) {
                                 </div>
                             </div>
                             {!active && session.correction_allowed ? (
-                                <select
+                                <Select
                                     aria-label={`Status ${record.student_name_snapshot}`}
                                     value={
                                         form.data.records[index]?.status ??
@@ -249,7 +250,7 @@ export default function Session({ session }: { session: AttendanceSession }) {
                                             </option>
                                         ),
                                     )}
-                                </select>
+                                </Select>
                             ) : (
                                 <StatusBadge status={record.status} />
                             )}

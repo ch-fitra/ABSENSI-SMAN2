@@ -23,6 +23,7 @@ import {
     PublicFormStatus,
 } from "@/components/public-attendance";
 import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
 import { queryString } from "@/lib/utils";
 import {
     usePublicFormPolling,
@@ -146,7 +147,7 @@ export default function Responses({
                         />
                     </Field>
                     <Field label="Kelas">
-                        <select
+                        <Select
                             value={search.data.class_name}
                             onChange={(e) =>
                                 search.setData("class_name", e.target.value)
@@ -158,10 +159,10 @@ export default function Responses({
                                     {name}
                                 </option>
                             ))}
-                        </select>
+                        </Select>
                     </Field>
                     <Field label="Status kehadiran">
-                        <select
+                        <Select
                             value={search.data.status}
                             onChange={(e) =>
                                 search.setData("status", e.target.value)
@@ -176,7 +177,7 @@ export default function Responses({
                                     </option>
                                 ),
                             )}
-                        </select>
+                        </Select>
                     </Field>
                     <Field label="Tanggal awal">
                         <input

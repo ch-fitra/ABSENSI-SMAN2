@@ -16,6 +16,7 @@ import {
     PublicFormStatus,
 } from "@/components/public-attendance";
 import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
 import { useServerClock, wibDate, wibTime } from "@/lib/public-attendance";
 import type { AttendanceStatus, PublicAttendanceForm } from "@/types";
 
@@ -154,7 +155,7 @@ export default function PublicForm({
                                 label="Tingkat kelas"
                                 error={attendance.errors.class_name}
                             >
-                                <select
+                                <Select
                                     required
                                     value={attendance.data.class_name}
                                     onChange={(e) =>
@@ -171,7 +172,7 @@ export default function PublicForm({
                                             {name}
                                         </option>
                                     ))}
-                                </select>
+                                </Select>
                             </Field>
                             <Field label="Tanggal absensi">
                                 <input
@@ -185,7 +186,7 @@ export default function PublicForm({
                             label="Mata pelajaran"
                             error={attendance.errors.subject_name}
                         >
-                            <select
+                            <Select
                                 required
                                 value={attendance.data.subject_name}
                                 onChange={(e) =>
@@ -202,14 +203,14 @@ export default function PublicForm({
                                         {name}
                                     </option>
                                 ))}
-                            </select>
+                            </Select>
                         </Field>
                         <div className="public-input-pair">
                             <Field
                                 label="Les ke-"
                                 error={attendance.errors.lesson_number}
                             >
-                                <select
+                                <Select
                                     required
                                     value={attendance.data.lesson_number}
                                     onChange={(e) =>
@@ -229,7 +230,7 @@ export default function PublicForm({
                                             Les ke-{value}
                                         </option>
                                     ))}
-                                </select>
+                                </Select>
                             </Field>
                             <Field
                                 label="Jam absensi (WIB)"

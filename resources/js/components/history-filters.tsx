@@ -3,6 +3,7 @@ import { Filter, RotateCcw } from "lucide-react";
 import type { FormEvent } from "react";
 import { Field } from "./shared";
 import { Button } from "./ui/button";
+import { Select } from "./ui/select";
 import type { Filters, SchoolClass } from "@/types";
 
 export function HistoryFilters({
@@ -51,7 +52,7 @@ export function HistoryFilters({
             {!student && (
                 <>
                     <Field label="Kelas">
-                        <select
+                        <Select
                             value={form.data.class_id}
                             onChange={(e) =>
                                 form.setData("class_id", e.target.value)
@@ -63,7 +64,7 @@ export function HistoryFilters({
                                     {c.name}
                                 </option>
                             ))}
-                        </select>
+                        </Select>
                     </Field>
                     <Field label="Mata pelajaran">
                         <input
@@ -76,7 +77,7 @@ export function HistoryFilters({
                         />
                     </Field>
                     <Field label="Status sesi">
-                        <select
+                        <Select
                             value={form.data.status}
                             onChange={(e) =>
                                 form.setData("status", e.target.value)
@@ -86,7 +87,7 @@ export function HistoryFilters({
                             <option value="active">Sedang berlangsung</option>
                             <option value="review">Menunggu konfirmasi</option>
                             <option value="confirmed">Terkonfirmasi</option>
-                        </select>
+                        </Select>
                     </Field>
                 </>
             )}

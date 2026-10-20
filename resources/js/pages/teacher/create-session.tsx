@@ -10,6 +10,7 @@ import {
     PageHeader,
 } from "@/components/shared";
 import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
 import type { SchoolClass } from "@/types";
 
 export default function CreateSession({
@@ -57,7 +58,7 @@ export default function CreateSession({
                         <form className="form-stack" onSubmit={submit}>
                             <Errors errors={form.errors} />
                             <Field label="Kelas">
-                                <select
+                                <Select
                                     required
                                     value={form.data.class_id}
                                     onChange={(e) =>
@@ -73,7 +74,7 @@ export default function CreateSession({
                                             aktif
                                         </option>
                                     ))}
-                                </select>
+                                </Select>
                             </Field>
                             <Field
                                 label="Mata pelajaran"

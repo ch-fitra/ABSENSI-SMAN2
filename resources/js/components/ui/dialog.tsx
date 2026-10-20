@@ -23,7 +23,14 @@ export function Dialog({
             )}
             <DialogPrimitive.Portal>
                 <DialogPrimitive.Overlay className="dialog-overlay" />
-                <DialogPrimitive.Content className="dialog-content">
+                <DialogPrimitive.Content
+                    className="dialog-content"
+                    onEscapeKeyDown={(event) => {
+                        if (event.target instanceof HTMLElement && event.target.closest(".select-root")?.querySelector(".select-menu:popover-open")) {
+                            event.preventDefault();
+                        }
+                    }}
+                >
                     <DialogPrimitive.Title className="dialog-title">
                         {title}
                     </DialogPrimitive.Title>

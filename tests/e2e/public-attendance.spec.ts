@@ -2,6 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import jsQR from "jsqr";
 import { mkdir, readFile } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
+import { chooseOption } from "./select-helpers";
 
 async function noOverflow(page: Page) {
     expect(
@@ -170,19 +171,20 @@ test("link dan QR: guru membuat, tamu mengisi, polling rekap, dan PDF", async ({
         "",
     );
     await guest.getByLabel("Nama lengkap siswa").fill("Alya Putri");
-    await guest.getByLabel("Tingkat kelas").selectOption("XI-8");
+    await chooseOption(guest, guest.getByRole("combobox", { name: "Tingkat kelas", exact: true }), "XI-8");
     const subject = guest.getByRole("combobox", { name: "Mata pelajaran", exact: true });
-    await expect(subject).toHaveValue("");
-    await expect(subject).toHaveAttribute("required", "");
-    await expect(subject.locator("option")).toHaveText([
-        "Pilih mata pelajaran", "Agama", "Bahasa Arab", "Bahasa Indonesia",
+    await expect(subject).toContainText("Pilih mata pelajaran");
+    await expect(subject).toHaveAttribute("aria-required", "true");
+    await subject.click();
+    await expect(guest.getByRole("option")).toHaveText([
+        "Agama", "Bahasa Arab", "Bahasa Indonesia",
         "Bahasa Inggris", "Bahasa Inggris TL", "Geografi", "Matematika",
         "Penjaskes", "PKN", "Prakarya", "Sejarah", "Seni Budaya", "Sosiologi", "UPB",
     ]);
-    await subject.selectOption("Bahasa Inggris TL");
-    await expect(subject).toHaveValue("Bahasa Inggris TL");
-    await subject.selectOption("Matematika");
-    await guest.getByLabel("Les ke-", { exact: true }).selectOption("20");
+    await guest.getByRole("option", { name: "Bahasa Inggris TL", exact: true }).click();
+    await expect(subject).toContainText("Bahasa Inggris TL");
+    await chooseOption(guest, subject, "Matematika");
+    await chooseOption(guest, guest.getByRole("combobox", { name: "Les ke-", exact: true }), "Les ke-20");
     await guest.getByRole("radio", { name: "Hadir", exact: true }).check();
     await guest.getByLabel("Keterangan (opsional)").fill("Belajar dari rumah.");
     await noOverflow(guest);

@@ -1,0 +1,148 @@
+.select-root {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+}
+.select-root > .select-native {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+.select-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--text);
+    text-align: left;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+    transition: border-color 160ms, box-shadow 160ms, background 160ms;
+}
+.select-trigger > span { min-width: 0; overflow-wrap: anywhere; }
+.select-trigger > svg { flex-shrink: 0; color: var(--muted); transition: transform 160ms; }
+.select-trigger:hover:not(:disabled) { border-color: #93b8ac; background: var(--surface-soft); }
+.select-trigger:focus-visible,
+.select-trigger[aria-expanded="true"] {
+    outline: none;
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 12%, transparent);
+}
+.select-trigger[aria-expanded="true"] > svg { transform: rotate(180deg); color: var(--green); }
+.select-trigger[data-placeholder="true"] { color: var(--muted); }
+.select-trigger[aria-invalid="true"] { border-color: #d46767; }
+.select-menu {
+    position: fixed;
+    inset: auto;
+    margin: 0;
+    padding: 6px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 16px 50px #102d4526, 0 3px 10px #102d450a;
+    overflow: hidden;
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.5;
+}
+.select-menu:popover-open {
+    display: flex;
+    flex-direction: column;
+    animation: select-appear 150ms ease-out;
+}
+.select-menu::backdrop { background: transparent; }
+.select-search {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 9px;
+    padding: 4px 10px 8px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+}
+.select-search > svg { flex-shrink: 0; }
+.select-search > input {
+    width: 100%;
+    min-width: 0;
+    min-height: 38px;
+    padding: 7px 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    outline: none;
+    box-shadow: none;
+}
+.select-options {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #adc4ba transparent;
+    padding: 2px;
+    scroll-padding: 4px;
+}
+.select-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 44px;
+    padding: 10px 12px;
+    margin: 2px 0;
+    border-radius: 10px;
+    cursor: pointer;
+    user-select: none;
+    overflow-wrap: anywhere;
+    transition: background 100ms;
+}
+.select-option > svg { flex-shrink: 0; }
+.select-option[data-highlighted="true"] { background: var(--surface-soft); }
+.select-option[aria-selected="true"] {
+    background: color-mix(in srgb, var(--green) 11%, var(--surface));
+    color: var(--green);
+    font-weight: 600;
+}
+.select-option[aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
+.select-footnote {
+    flex-shrink: 0;
+    margin-top: 5px;
+    padding: 8px 12px 3px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 10px;
+}
+.select-empty { padding: 20px 12px; color: var(--muted); text-align: center; }
+.dark .select-menu { box-shadow: 0 18px 50px #0006; }
+.dark .select-option[aria-selected="true"] { color: #88d6b8; }
+.public-entry-card .select-trigger { min-height: 50px; font-size: 14px; }
+@keyframes select-appear {
+    from { opacity: 0; translate: 0 -4px; }
+    to { opacity: 1; translate: 0 0; }
+}
+@media (max-width: 640px) {
+    .select-trigger, .select-menu, .public-entry-card .select-trigger { font-size: 16px; }
+    .select-option { min-height: 46px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .select-menu:popover-open { animation: none; }
+    .select-trigger, .select-trigger > svg, .select-option { transition: none; }
+}

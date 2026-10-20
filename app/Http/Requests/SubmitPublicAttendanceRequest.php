@@ -28,7 +28,7 @@ class SubmitPublicAttendanceRequest extends FormRequest
         return [
             'student_name' => ['required', 'string', 'max:150', "regex:/\A(?=.*\p{L})[\p{L}\p{M}\s.'\x{2019}\-]+\z/u"],
             'class_name' => ['required', 'string', 'max:40', Rule::in(app(PublicAttendanceService::class)->classOptions())],
-            'subject_name' => ['required', 'string', 'max:120', 'regex:/\p{L}/u', 'not_regex:/[<>\x00-\x1F\x7F]/u'],
+            'subject_name' => ['required', 'string', 'max:120', Rule::in(app(PublicAttendanceService::class)->subjectOptions())],
             'lesson_number' => ['required', 'integer', 'between:1,20'],
             'attendance_status' => ['required', Rule::in(['hadir', 'izin', 'sakit', 'alpa'])],
             'notes' => ['nullable', 'string', 'max:500'],

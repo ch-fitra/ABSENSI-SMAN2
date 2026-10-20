@@ -25,6 +25,7 @@ class PublicAttendanceController extends Controller
         return Inertia::render('public-attendance/form', [
             'form' => $form->only('title', 'starts_at', 'expires_at', 'duration_minutes'),
             'isActive' => $form->isActive(), 'classes' => $submittedAt || ! $form->isActive() ? [] : $attendance->classOptions(),
+            'subjects' => $attendance->subjectOptions(),
             'submitUrl' => route('public-attendance.store', ['token' => $token]),
             'idempotencyKey' => (string) Str::uuid(), 'submittedAt' => $submittedAt,
         ]);

@@ -86,6 +86,8 @@ class PublicAttendanceTest extends TestCase
             ->assertHeader('Referrer-Policy', 'no-referrer')
             ->assertInertia(fn (Assert $page) => $page->component('public-attendance/form')->where('isActive', true)
                 ->has('classes', 25)->where('classes.0', 'X-1')->where('classes.24', 'XI-9')
+                ->where('subjects', ['Agama', 'Bahasa Arab', 'Bahasa Indonesia', 'Bahasa Inggris', 'Bahasa Inggris TL',
+                    'Geografi', 'Matematika', 'Penjaskes', 'PKN', 'Prakarya', 'Sejarah', 'Seni Budaya', 'Sosiologi', 'UPB'])
                 ->missing('submissions')->missing('summary')->missing('form.teacher_id')->missing('form.public_token')->where('submittedAt', null));
         $this->assertDatabaseCount('students', 0);
         $this->assertGuest();
@@ -107,12 +109,44 @@ class PublicAttendanceTest extends TestCase
         $this->get($this->endpoint($form))->assertInertia(fn (Assert $page) => $page->where('submittedAt', '2026-10-19T17:45:00+00:00')->has('classes', 0));
     }
 
+    public static function scheduledSubjects(): array
+    {
+        return [
+            ['Agama'], ['Bahasa Arab'], ['Bahasa Indonesia'], ['Bahasa Inggris'], ['Bahasa Inggris TL'],
+            ['Geografi'], ['Matematika'], ['Penjaskes'], ['PKN'], ['Prakarya'], ['Sejarah'], ['Seni Budaya'], ['Sosiologi'], ['UPB'],
+        ];
+    }
+
+    #[DataProvider('scheduledSubjects')]
+    public function test_scheduled_subject_is_accepted_and_saved(string $subject): void
+    {
+        $form = PublicAttendanceForm::factory()->create();
+
+        $this->post($this->endpoint($form), $this->payload(['subject_name' => $subject]))
+            ->assertSessionHasNoErrors()->assertRedirect($this->endpoint($form));
+
+        $this->assertDatabaseHas('public_attendance_submissions', [
+            'public_attendance_form_id' => $form->id, 'subject_name' => $subject,
+        ]);
+    }
+
+    public function test_unknown_subject_returns_a_selection_error_without_saving(): void
+    {
+        $form = PublicAttendanceForm::factory()->create();
+
+        $this->post($this->endpoint($form), $this->payload(['subject_name' => 'Mata Pelajaran Palsu']))
+            ->assertSessionHasErrors(['subject_name' => 'Pilih Mata pelajaran yang tersedia.']);
+
+        $this->assertDatabaseCount('public_attendance_submissions', 0);
+    }
+
     public static function invalidSubmissions(): array
     {
         return ['missing name' => [['student_name' => ''], 'student_name'], 'no letters' => [['student_name' => '1234'], 'student_name'],
             'html name' => [['student_name' => '<script>Nama</script>'], 'student_name'], 'long name' => [['student_name' => str_repeat('N', 151)], 'student_name'],
             'missing class' => [['class_name' => ''], 'class_name'], 'unknown class' => [['class_name' => 'Kelas Palsu'], 'class_name'],
             'missing subject' => [['subject_name' => ''], 'subject_name'], 'long subject' => [['subject_name' => str_repeat('M', 121)], 'subject_name'],
+            'array subject' => [['subject_name' => ['Matematika']], 'subject_name'],
             'missing lesson' => [['lesson_number' => null], 'lesson_number'], 'lesson zero' => [['lesson_number' => 0], 'lesson_number'],
             'lesson twenty one' => [['lesson_number' => 21], 'lesson_number'], 'fraction lesson' => [['lesson_number' => 1.5], 'lesson_number'],
             'missing status' => [['attendance_status' => ''], 'attendance_status'], 'invalid status' => [['attendance_status' => 'lulus'], 'attendance_status'],

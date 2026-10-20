@@ -23,6 +23,7 @@ export default function PublicForm({
     form,
     isActive,
     classes,
+    subjects,
     submitUrl,
     idempotencyKey,
     submittedAt,
@@ -33,6 +34,7 @@ export default function PublicForm({
     >;
     isActive: boolean;
     classes: string[];
+    subjects: string[];
     submitUrl: string;
     idempotencyKey: string;
     submittedAt: string | null;
@@ -183,10 +185,8 @@ export default function PublicForm({
                             label="Mata pelajaran"
                             error={attendance.errors.subject_name}
                         >
-                            <input
+                            <select
                                 required
-                                maxLength={120}
-                                placeholder="Contoh: Matematika"
                                 value={attendance.data.subject_name}
                                 onChange={(e) =>
                                     attendance.setData(
@@ -195,7 +195,14 @@ export default function PublicForm({
                                     )
                                 }
                                 disabled={attendance.processing}
-                            />
+                            >
+                                <option value="">Pilih mata pelajaran</option>
+                                {subjects.map((name) => (
+                                    <option value={name} key={name}>
+                                        {name}
+                                    </option>
+                                ))}
+                            </select>
                         </Field>
                         <div className="public-input-pair">
                             <Field

@@ -171,9 +171,17 @@ test("link dan QR: guru membuat, tamu mengisi, polling rekap, dan PDF", async ({
     );
     await guest.getByLabel("Nama lengkap siswa").fill("Alya Putri");
     await guest.getByLabel("Tingkat kelas").selectOption("XI-8");
-    await guest
-        .getByLabel("Mata pelajaran", { exact: true })
-        .fill("Matematika");
+    const subject = guest.getByRole("combobox", { name: "Mata pelajaran", exact: true });
+    await expect(subject).toHaveValue("");
+    await expect(subject).toHaveAttribute("required", "");
+    await expect(subject.locator("option")).toHaveText([
+        "Pilih mata pelajaran", "Agama", "Bahasa Arab", "Bahasa Indonesia",
+        "Bahasa Inggris", "Bahasa Inggris TL", "Geografi", "Matematika",
+        "Penjaskes", "PKN", "Prakarya", "Sejarah", "Seni Budaya", "Sosiologi", "UPB",
+    ]);
+    await subject.selectOption("Bahasa Inggris TL");
+    await expect(subject).toHaveValue("Bahasa Inggris TL");
+    await subject.selectOption("Matematika");
     await guest.getByLabel("Les ke-", { exact: true }).selectOption("20");
     await guest.getByRole("radio", { name: "Hadir", exact: true }).check();
     await guest.getByLabel("Keterangan (opsional)").fill("Belajar dari rumah.");

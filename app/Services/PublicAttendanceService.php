@@ -12,6 +12,27 @@ use Illuminate\Validation\ValidationException;
 class PublicAttendanceService
 {
     /** @return list<string> */
+    public function subjectOptions(): array
+    {
+        return [
+            'Agama',
+            'Bahasa Arab',
+            'Bahasa Indonesia',
+            'Bahasa Inggris',
+            'Bahasa Inggris TL',
+            'Geografi',
+            'Matematika',
+            'Penjaskes',
+            'PKN',
+            'Prakarya',
+            'Sejarah',
+            'Seni Budaya',
+            'Sosiologi',
+            'UPB',
+        ];
+    }
+
+    /** @return list<string> */
     public function classOptions(): array
     {
         $defaults = [];

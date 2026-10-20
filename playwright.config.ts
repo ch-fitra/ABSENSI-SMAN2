@@ -5,7 +5,9 @@ import path from "node:path";
 process.env.E2E_PASSWORD ??= randomBytes(20).toString("hex");
 const php =
     process.platform === "win32" ? path.resolve(".runtime/php/php.exe") : "php";
-const database = process.env.E2E_DB_DATABASE ?? "absensi_sman2_browser_test";
+const database =
+    process.env.E2E_DB_DATABASE ??
+    `absensi_sman2_browser_${randomBytes(6).toString("hex")}_test`;
 if (!database.endsWith("_test"))
     throw new Error("E2E requires a dedicated database ending in _test");
 process.env.E2E_DB_DATABASE = database;

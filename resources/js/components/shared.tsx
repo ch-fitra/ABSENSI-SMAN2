@@ -162,7 +162,13 @@ export function StatusBadge({
         </span>
     );
 }
-export function Stats({ summary }: { summary: Summary }) {
+export function Stats({
+    summary,
+    confirmed = true,
+}: {
+    summary: Summary;
+    confirmed?: boolean;
+}) {
     const reduceMotion = useReducedMotion();
     return (
         <div className="stats-grid">
@@ -189,7 +195,9 @@ export function Stats({ summary }: { summary: Summary }) {
                     <strong>{summary[key].toLocaleString("id-ID")}</strong>
                     <small>
                         {key === "total"
-                            ? "Hasil terkonfirmasi"
+                            ? confirmed
+                                ? "Hasil terkonfirmasi"
+                                : "Respons tersimpan"
                             : "Catatan kehadiran"}
                     </small>
                     <span className="stat-meter" aria-hidden="true">

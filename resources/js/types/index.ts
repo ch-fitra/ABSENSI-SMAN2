@@ -1,4 +1,35 @@
 export type AttendanceStatus = "hadir" | "izin" | "sakit" | "alpa";
+export type PublicAttendanceForm = {
+    id: number;
+    title: string;
+    starts_at: string;
+    expires_at: string;
+    duration_minutes: number;
+    is_active: boolean;
+    public_url: string;
+    detail_url: string;
+    responses_url: string;
+    report_url: string;
+    submissions_count: number;
+};
+export type PublicAttendanceSubmission = {
+    id: number;
+    student_name: string;
+    class_name: string;
+    subject_name: string;
+    lesson_number: number;
+    attendance_status: AttendanceStatus;
+    notes: string | null;
+    submitted_at: string;
+    possible_duplicate: boolean;
+};
+export type PublicAttendanceFilters = {
+    search?: string;
+    class_name?: string;
+    status?: string;
+    from?: string;
+    to?: string;
+};
 export type Summary = Record<AttendanceStatus | "total", number>;
 export type SchoolClass = {
     id: number;

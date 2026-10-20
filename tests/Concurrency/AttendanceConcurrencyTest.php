@@ -3,16 +3,71 @@
 namespace Tests\Concurrency;
 
 use App\Models\AttendanceSession;
+use App\Models\PublicAttendanceForm;
 use App\Models\Student;
 use App\Models\User;
 use App\Services\AttendanceService;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 use Tests\TestCase;
 
 class AttendanceConcurrencyTest extends TestCase
 {
-    use DatabaseMigrations;
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $connection = config('database.connections.mysql');
+        $database = 'absensi_concurrency_'.bin2hex(random_bytes(6)).'_test';
+        $pdo = new \PDO('mysql:host='.$connection['host'].';port='.$connection['port'], $connection['username'], $connection['password']);
+        $pdo->exec('CREATE DATABASE `'.$database.'` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        config(['database.connections.mysql.database' => $database]);
+        DB::purge('mysql');
+        $this->artisan('migrate', ['--force' => true]);
+    }
+
+    public function test_parallel_public_retries_return_the_same_single_submission(): void
+    {
+        $form = PublicAttendanceForm::factory()->create();
+        $key = (string) Str::uuid();
+        $barrier = sys_get_temp_dir().'/sman2-public-race-'.bin2hex(random_bytes(8));
+        $connection = config('database.connections.mysql');
+        $environment = ['APP_ENV' => 'testing', 'DB_CONNECTION' => 'mysql', 'DB_HOST' => $connection['host'], 'DB_PORT' => (string) $connection['port'],
+            'DB_DATABASE' => $connection['database'], 'DB_USERNAME' => $connection['username'], 'DB_PASSWORD' => $connection['password'], 'CACHE_STORE' => 'array'];
+        $processes = [];
+        foreach ([0, 1] as $worker) {
+            $processes[] = $process = new Process([PHP_BINARY, base_path('tests/helpers/public-race-worker.php'), (string) $form->id, $key, $barrier, (string) $worker], base_path(), $environment, timeout: 15);
+            $process->start();
+        }
+        try {
+            $deadline = microtime(true) + 10;
+            while (! (file_exists($barrier.'.0') && file_exists($barrier.'.1'))) {
+                if (microtime(true) > $deadline) {
+                    $this->fail('Public race workers failed to start.');
+                }
+                usleep(10000);
+            }
+            touch($barrier.'.go');
+            foreach ($processes as $process) {
+                $process->wait();
+                $this->assertTrue($process->isSuccessful(), $process->getErrorOutput());
+            }
+            $this->assertSame(trim($processes[0]->getOutput()), trim($processes[1]->getOutput()));
+            $this->assertSame(1, $form->submissions()->count());
+            $this->assertSame('hadir', $form->submissions()->sole()->attendance_status);
+        } finally {
+            foreach ($processes as $process) {
+                if ($process->isRunning()) {
+                    $process->stop();
+                }
+            }
+            foreach (['.0', '.1', '.go'] as $suffix) {
+                if (is_file($barrier.$suffix)) {
+                    unlink($barrier.$suffix);
+                }
+            }
+        }
+    }
 
     private function race(string $firstAction, string $secondAction, AttendanceSession $session, Student $student): array
     {

@@ -23,6 +23,11 @@ class User extends Authenticatable
         return $this->hasMany(AttendanceSession::class, 'teacher_id');
     }
 
+    public function publicAttendanceForms(): HasMany
+    {
+        return $this->hasMany(PublicAttendanceForm::class, 'teacher_id');
+    }
+
     /**
      * Get the attributes that should be cast.
      *

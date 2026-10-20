@@ -8,9 +8,9 @@ use App\Models\Student;
 use App\Models\User;
 use App\Services\AttendanceReportService;
 use App\Services\AttendanceService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Testing\AssertableInertia as Assert;
+use Tests\RefreshDatabaseWithoutReset as RefreshDatabase;
 use Tests\TestCase;
 
 class AttendanceTest extends TestCase

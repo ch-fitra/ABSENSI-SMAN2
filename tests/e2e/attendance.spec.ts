@@ -28,6 +28,7 @@ test("alur guru dan siswa, konfirmasi, koreksi, PDF, serta tampilan responsif", 
     page,
     browser,
 }, testInfo) => {
+    test.setTimeout(90000);
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));
     await mkdir(".runtime/screenshots", { recursive: true });
@@ -63,8 +64,27 @@ test("alur guru dan siswa, konfirmasi, koreksi, PDF, serta tampilan responsif", 
         fullPage: true,
     });
     await page
-        .getByRole("link", { name: "Mulai Absensi", exact: true })
+        .getByRole("button", { name: "Mulai Absensi", exact: true })
         .click();
+    const methodDialog = page.getByRole("dialog", { name: "Mulai absensi dengan cara apa?" });
+    await expect(methodDialog).toBeVisible();
+    await expect(methodDialog).toHaveCSS("opacity", "1");
+    await noOverflow(page);
+    await page.screenshot({
+        path: `.runtime/screenshots/${testInfo.project.name}-attendance-method.png`,
+        fullPage: true,
+    });
+    await methodDialog.getByRole("link", { name: /Absensi via Link/ }).click();
+    await expect(page).toHaveURL(/\/guru\/absensi-link\/buat$/);
+    await page.goto("/guru");
+    const startAttendance = page.getByRole("button", { name: "Mulai Absensi", exact: true });
+    await startAttendance.click();
+    await page.keyboard.press("Escape");
+    await expect(methodDialog).not.toBeVisible();
+    await expect(startAttendance).toBeFocused();
+    await startAttendance.click();
+    await methodDialog.getByRole("link", { name: /Buka Sesi Absen/ }).click();
+    await expect(page).toHaveURL(/\/guru\/absensi\/buat$/);
     await page
         .getByLabel("Kelas", { exact: true })
         .selectOption({ label: "X-1 · 3 siswa aktif" });

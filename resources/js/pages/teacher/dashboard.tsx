@@ -3,9 +3,11 @@ import {
     ArrowRight,
     BookOpen,
     CalendarDays,
+    Link2,
     Plus,
     Sparkles,
 } from "lucide-react";
+import { useState } from "react";
 import AppLayout from "@/layouts/app-layout";
 import {
     EmptyState,
@@ -15,6 +17,7 @@ import {
     Stats,
 } from "@/components/shared";
 import { Button } from "@/components/ui/button";
+import { Dialog } from "@/components/ui/dialog";
 import type { AttendanceSession, SharedProps, Summary } from "@/types";
 
 export default function Dashboard({
@@ -29,6 +32,7 @@ export default function Dashboard({
     sessionCount: number;
 }) {
     const { auth, serverNow } = usePage<SharedProps>().props;
+    const [attendanceOptionsOpen, setAttendanceOptionsOpen] = useState(false);
     usePoll(15000, {
         only: ["sessions", "recent", "summary", "sessionCount", "serverNow"],
     });
@@ -66,12 +70,49 @@ export default function Dashboard({
                         dapat langsung mengisi kehadiran mereka.
                     </p>
                 </div>
-                <Button asChild variant="secondary">
-                    <Link href="/guru/absensi/buat">
-                        <Plus size={19} />
-                        Mulai Absensi
-                    </Link>
-                </Button>
+                <Dialog
+                    open={attendanceOptionsOpen}
+                    onOpenChange={setAttendanceOptionsOpen}
+                    title="Mulai absensi dengan cara apa?"
+                    description="Pilih cara yang sesuai untuk kelas Anda."
+                    trigger={
+                        <Button variant="secondary">
+                            <Plus size={19} />
+                            Mulai Absensi
+                        </Button>
+                    }
+                >
+                    <div className="attendance-methods">
+                        <Link
+                            href="/guru/absensi-link/buat"
+                            className="attendance-method"
+                            onClick={() => setAttendanceOptionsOpen(false)}
+                        >
+                            <span className="attendance-method-icon" aria-hidden="true">
+                                <Link2 size={23} />
+                            </span>
+                            <span className="attendance-method-copy">
+                                <strong>Absensi via Link</strong>
+                                <span>Bagikan link atau QR code agar siswa dapat mengisi absensi tanpa login.</span>
+                            </span>
+                            <ArrowRight size={19} aria-hidden="true" />
+                        </Link>
+                        <Link
+                            href="/guru/absensi/buat"
+                            className="attendance-method"
+                            onClick={() => setAttendanceOptionsOpen(false)}
+                        >
+                            <span className="attendance-method-icon attendance-method-icon-session" aria-hidden="true">
+                                <BookOpen size={23} />
+                            </span>
+                            <span className="attendance-method-copy">
+                                <strong>Buka Sesi Absen</strong>
+                                <span>Pilih kelas dari daftar siswa. Siswa masuk dengan NISN untuk mengisi kehadiran.</span>
+                            </span>
+                            <ArrowRight size={19} aria-hidden="true" />
+                        </Link>
+                    </div>
+                </Dialog>
             </section>
             <Stats summary={summary} />
             <section className="section-space">

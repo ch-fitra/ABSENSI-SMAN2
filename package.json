@@ -9,17 +9,18 @@
         "test:e2e": "playwright test"
     },
     "dependencies": {
+        "@fontsource/inter": "^5.2",
         "@inertiajs/react": "^2.0",
         "@radix-ui/react-dialog": "^1.1",
         "@radix-ui/react-slot": "^1.2",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1",
-        "tailwind-merge": "^3.0",
         "lucide-react": "^0.468.0",
         "motion": "^12.0",
+        "qrcode.react": "^4.2.0",
         "react": "^19.0",
         "react-dom": "^19.0",
-        "@fontsource/inter": "^5.2"
+        "tailwind-merge": "^3.0"
     },
     "devDependencies": {
         "@playwright/test": "^1.56",
@@ -28,6 +29,7 @@
         "@types/react": "^19.0",
         "@types/react-dom": "^19.0",
         "@vitejs/plugin-react": "^5.0",
+        "jsqr": "^1.4.0",
         "laravel-vite-plugin": "^2.0",
         "tailwindcss": "^4.1",
         "typescript": "^5.9",

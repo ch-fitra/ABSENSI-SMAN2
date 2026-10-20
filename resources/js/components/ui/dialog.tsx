@@ -6,16 +6,21 @@ export function Dialog({
     onOpenChange,
     title,
     description,
+    trigger,
     children,
 }: {
     open: boolean;
     onOpenChange: (v: boolean) => void;
     title: string;
     description: string;
+    trigger?: ReactNode;
     children: ReactNode;
 }) {
     return (
         <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
+            {trigger && (
+                <DialogPrimitive.Trigger asChild>{trigger}</DialogPrimitive.Trigger>
+            )}
             <DialogPrimitive.Portal>
                 <DialogPrimitive.Overlay className="dialog-overlay" />
                 <DialogPrimitive.Content className="dialog-content">

@@ -22,6 +22,10 @@ class AppServiceProvider extends ServiceProvider
             Limit::perMinute(30)->by($request->ip()),
             Limit::perMinute(5)->by($request->ip().'|'.hash('sha256', strtolower((string) $request->input('email', $request->input('nisn', ''))))),
         ]);
+        RateLimiter::for('public-attendance', fn (Request $request) => [
+            Limit::perMinute(60)->by('public-form|'.$request->ip().'|'.$request->route('token')),
+            Limit::perMinute(300)->by('public-ip|'.$request->ip()),
+        ]);
         foreach (['reports' => 10, 'imports' => 10, 'submissions' => 30] as $name => $limit) {
             RateLimiter::for($name, fn (Request $request) => Limit::perMinute($limit)->by($request->user()?->getAuthIdentifier().'|'.$request->path()));
         }

@@ -6,6 +6,7 @@ import {
     GraduationCap,
     Home,
     LogOut,
+    Link2,
     Menu,
     Moon,
     Settings,
@@ -83,6 +84,11 @@ export default function AppLayout({
         ? [
               { label: "Dashboard", href: root, icon: Home },
               {
+                  label: "Absensi via Link",
+                  href: `${root}/absensi-link`,
+                  icon: Link2,
+              },
+              {
                   label: "Absensi",
                   href: `${root}/absensi/buat`,
                   icon: BookOpen,
@@ -117,6 +123,7 @@ export default function AppLayout({
     }
     const isActive = (href: string) =>
         url === href ||
+        (href.endsWith("/absensi-link") && url.startsWith(href + "/")) ||
         (href.endsWith("/absensi/buat") && url.includes("/absensi/"));
     return (
         <div className="app-shell">
@@ -298,7 +305,9 @@ export default function AppLayout({
                             {label === "Riwayat & Rekap" ||
                             label === "Riwayat Kehadiran"
                                 ? "Riwayat"
-                                : label}
+                                : label === "Absensi via Link"
+                                  ? "Via Link"
+                                  : label}
                         </small>
                     </Link>
                 ))}

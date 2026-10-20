@@ -8,7 +8,6 @@ use App\Models\User;
 use App\Services\AttendanceReportService;
 use App\Services\AttendanceService;
 use App\Services\StudentImportService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
@@ -17,6 +16,7 @@ use Inertia\Testing\AssertableInertia as Assert;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Tests\RefreshDatabaseWithoutReset as RefreshDatabase;
 use Tests\TestCase;
 
 class ImportAndReportTest extends TestCase

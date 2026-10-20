@@ -17,7 +17,40 @@ Aplikasi absensi siswa dengan dua peran: **Guru** dan **Siswa**. Semua tampilan 
 - Konfirmasi guru; hasil resmi dan PDF hanya berasal dari sesi terkonfirmasi.
 - Koreksi hingga tepat sebelum 7 hari sejak penutupan; audit status dan keterangan. Konfirmasi tanpa perubahan tetap boleh setelah masa koreksi.
 - Riwayat berfilter, statistik berdasarkan jumlah **catatan kehadiran**, PDF A4 per sesi/periode.
-- Tidak ada admin, pendaftaran guru publik, jadwal, nilai, QR, GPS, atau modul SIAKAD.
+- Absensi via Link: formulir publik tanpa login, QR Code, durasi, rekap terpisah, dan PDF.
+- Tidak ada admin, pendaftaran guru publik, jadwal, nilai, GPS, atau modul SIAKAD.
+
+## Absensi via Link dan QR Code
+
+Modul ini berjalan terpisah dari absensi berdasarkan NISN. Respons publik disimpan dalam `public_attendance_forms` dan `public_attendance_submissions`, tanpa membuat akun/siswa, mengubah roster, atau menambah statistik `attendance_records`.
+
+1. Login sebagai guru, buka **Absensi via Link** di sidebar atau **Via Link** pada navigasi bawah ponsel.
+2. Pilih **Buat Link Absensi**, isi judul maksimal 150 karakter dan durasi. Default 30 menit; preset 5/10/15/30/60/120 menit; durasi khusus 1–1.440 menit.
+3. Tekan **Generate Link & QR Code**. Masa aktif dimulai saat server membuat formulir.
+4. Tekan **Salin Link** atau **Unduh QR Code**. QR berupa SVG beresolusi bebas dengan area putih di sekelilingnya, dibuat lokal memakai `qrcode.react` tanpa layanan QR eksternal. Link dan QR tidak berubah saat halaman dibuka ulang.
+5. Siswa membuka `/form-absensi/{token}` tanpa login/NISN, mengisi nama, kelas, pelajaran, les ke-1 sampai ke-20, status Hadir/Izin/Sakit/Alpa, dan keterangan opsional. Tanggal serta jam WIB ditampilkan otomatis; timestamp resmi selalu dicatat server dalam UTC saat menerima kiriman.
+6. Setelah **Simpan Absensi** berhasil, siswa mendapat konfirmasi di halaman yang sama. Memuat ulang halaman menampilkan tanda terima miliknya pada sesi browser tersebut.
+7. Guru memilih **Lihat Respons**. Tersedia pencarian nama, filter kelas/status/tanggal, pagination, indikasi kemungkinan duplikat, statistik, dan pembaruan otomatis setiap 10 detik selama formulir aktif. Polling mempertahankan filter.
+8. Pilih **Unduh PDF** untuk rekap A4 landscape sesuai filter. Hanya guru pemilik yang dapat membuka detail, rekap, dan PDF; respons tetap tersedia setelah kedaluwarsa. Unduhan dibatasi 5.000 respons per PDF.
+
+Dropdown kelas menggabungkan X-1 sampai XII-8 dengan kelas aktif yang tersedia, tanpa duplikasi dan tanpa bergantung pada isi tabel siswa. Formulir tidak memerlukan pembuatan kelas atau impor roster.
+
+Server menolak pengiriman baru ketika `now >= expires_at`, termasuk formulir yang sudah terbuka sebelum batas waktu. Countdown hanya indikator visual dan formulir otomatis berganti menjadi halaman berakhir. Tidak diperlukan scheduler untuk modul publik ini. Retry atas kiriman yang sudah berhasil tetap mengembalikan keberhasilan tanpa menambah respons; key yang sama dengan data berbeda ditolak.
+
+**Batas pengisian anonim:** siapa pun yang mempunyai link dapat mengisi. Sistem tidak memverifikasi identitas siswa dan tidak menjamin satu siswa hanya mengisi sekali. Tombol proses, idempotency key unik per formulir, transaksi dengan row lock, CSRF, validasi, honeypot, dan rate limiting mengurangi kesalahan/spam; semuanya tidak membuktikan identitas. Nama yang dinormalisasi dan kelas yang sama ditandai untuk ditinjau, bukan diblokir mutlak. Rate limit 60 kiriman/menit per IP+form dan 300/menit per IP; respons publik tidak dapat dilihat pengunjung lain. Halaman publik menggunakan `noindex`, `no-store`, dan kebijakan referrer terbatas.
+
+Untuk dibuka dari HP lain, gunakan alamat situs yang dapat dijangkau perangkat itu. `127.0.0.1`/`localhost` hanya menunjuk perangkat yang membuka link. Pada jaringan lokal, jalankan `php artisan serve --host=0.0.0.0`, akses lewat IP LAN komputer pada jaringan yang sama, lalu buat/salin link dari alamat tersebut. Pada server gunakan domain HTTPS aktual dan atur `APP_URL`; pastikan port/jaringan dapat dijangkau. Membuka firewall atau deployment tidak dilakukan otomatis.
+
+### Pembaruan instalasi tanpa menghapus data
+
+```powershell
+npm ci
+php artisan migrate
+npm run build
+php artisan serve
+```
+
+Migration baru `2026_10_19_150535_create_public_attendance_tables.php` hanya menambahkan dua tabel beserta indeks, foreign key, status terbatas, dan constraint idempotency. Tidak mengubah tabel absensi lama. Jangan menggunakan perintah reset database untuk pembaruan ini. Tidak ada dependency Composer tambahan; `jsqr` merupakan dependency pengujian untuk membaca balik QR unduhan dan memastikan URL-nya benar.
 
 ## Stack dan kebutuhan
 
@@ -188,7 +221,9 @@ CREATE DATABASE absensi_sman2_browser_test CHARACTER SET utf8mb4 COLLATE utf8mb4
 npm.cmd run test:e2e
 ```
 
-Suite concurrency menggunakan dua proses PHP nyata dan koneksi database berbeda. Playwright memakai Chrome yang terpasang, server sementara port **8001**, database khusus browser, serta password pengujian acak setiap eksekusi. Database pengujian tersebut akan dibersihkan; jangan arahkan ke database produksi. Pada Linux pasang Chrome atau ubah `channel` di `playwright.config.ts` ke browser CI yang tersedia. Runtime PHP Windows untuk Playwright diambil dari `.runtime/php/php.exe`; Linux menggunakan PHP pada PATH.
+Suite feature memakai migrasi additive dan transaksi yang di-rollback per test; gunakan database pengujian kosong, bukan salinan data nyata. Tidak menjalankan reset database. Suite concurrency memakai dua proses PHP nyata dan membuat database terisolasi baru untuk setiap test. Playwright memakai Chrome yang terpasang, server sementara port **8001**, database baru bernama `absensi_sman2_browser_<acak>_test`, serta password acak setiap eksekusi. Akun database lokal pengujian memerlukan izin membuat database. Jika mengisi `E2E_DB_DATABASE` sendiri, sediakan database khusus yang kosong; setup menolak menimpa data pengujian sebelumnya. Database pengujian disisakan untuk inspeksi, tanpa menghapus database atau data lama. Jangan arahkan pengujian ke database produksi. Pada Linux pasang Chrome atau ubah `channel` di `playwright.config.ts` ke browser CI yang tersedia. Runtime PHP Windows untuk Playwright diambil dari `.runtime/php/php.exe`; Linux menggunakan PHP pada PATH.
+
+Pengujian fitur link mencakup validasi, waktu server/UTC/WIB, deadline, idempotency, kepemilikan guru, filter/pagination, PDF panjang, batas ukuran request, rate limit, serta pemisahan data lama. E2E mencakup pengisian tanpa login, CSRF, clipboard, pembacaan balik QR unduhan menggunakan `jsqr`, polling dengan filter, PDF, tema, dan ukuran layar 360/390/768/1024/1440 piksel.
 
 Lihat `docs/verification.md` untuk hasil eksekusi dan batas pemeriksaan. Screenshot/PDF pengujian disimpan di `.runtime/screenshots` yang diabaikan Git.
 
@@ -255,3 +290,59 @@ scripts/                   Setup PHP dan peluncur Windows
 ## Referensi teknis
 
 Dokumentasi diperiksa melalui Context7 saat implementasi: [Laravel 13](https://laravel.com/docs/13.x), [locking database](https://laravel.com/docs/13.x/queries#pessimistic-locking), [scheduler](https://laravel.com/docs/13.x/scheduling), dan [Inertia 2](https://inertiajs.com/docs/v2). Konfigurasi ringan ini memakai Inertia 2 stabil yang terverifikasi kompatibel dengan dependensi terpasang, tanpa modul autentikasi publik dari starter kit.
+
+## Berkas implementasi Absensi via Link
+
+Berkas baru (29):
+
+```text
+app/Http/Controllers/PublicAttendanceController.php
+app/Http/Controllers/TeacherPublicAttendanceController.php
+app/Http/Middleware/PublicAttendanceHeaders.php
+app/Http/Requests/PublicAttendanceReportRequest.php
+app/Http/Requests/StorePublicAttendanceFormRequest.php
+app/Http/Requests/SubmitPublicAttendanceRequest.php
+app/Models/PublicAttendanceForm.php
+app/Models/PublicAttendanceSubmission.php
+app/Policies/PublicAttendanceFormPolicy.php
+app/Services/PublicAttendanceReportService.php
+app/Services/PublicAttendanceService.php
+database/factories/PublicAttendanceFormFactory.php
+database/factories/PublicAttendanceSubmissionFactory.php
+database/migrations/2026_10_19_150535_create_public_attendance_tables.php
+resources/css/public-attendance.css
+resources/js/components/public-attendance.tsx
+resources/js/layouts/public-attendance-layout.tsx
+resources/js/lib/public-attendance.ts
+resources/js/pages/public-attendance/form.tsx
+resources/js/pages/public-attendance/notice.tsx
+resources/js/pages/teacher/public-attendance/create.tsx
+resources/js/pages/teacher/public-attendance/index.tsx
+resources/js/pages/teacher/public-attendance/responses.tsx
+resources/js/pages/teacher/public-attendance/show.tsx
+resources/views/reports/public-attendance.blade.php
+tests/Feature/PublicAttendanceTest.php
+tests/RefreshDatabaseWithoutReset.php
+tests/e2e/public-attendance.spec.ts
+tests/helpers/public-race-worker.php
+```
+
+Berkas lama yang diubah (15):
+
+```text
+README.md
+app/Models/User.php
+app/Providers/AppServiceProvider.php
+package-lock.json
+package.json
+playwright.config.ts
+resources/js/app.tsx
+resources/js/components/shared.tsx
+resources/js/layouts/app-layout.tsx
+resources/js/types/index.ts
+routes/web.php
+tests/Concurrency/AttendanceConcurrencyTest.php
+tests/Feature/AttendanceTest.php
+tests/Feature/ImportAndReportTest.php
+tests/helpers/browser-setup.php
+```
